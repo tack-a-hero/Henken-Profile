@@ -1,10 +1,12 @@
 export const VERSION=2;
 export const PHASES=['writer-pass','write','answer','result','finish'];
 export const shuffled=(items,rng=Math.random)=>{const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+export const MIN_PLAYERS=3;
+export const MAX_PLAYERS=6;
 export const cluesPerRound=playerCount=>playerCount===3?4:3;
 export function createGame(settings,faceIds,topics,rng=Math.random){
  const names=settings.names.map((x,i)=>String(x).trim().slice(0,18)||'プレイヤー'+(i+1));
- if(names.length<2||names.length>10)throw Error('2〜10人で遊べます。');
+ if(names.length<MIN_PLAYERS||names.length>MAX_PLAYERS)throw Error('3〜6人で遊べます。');
  const laps=settings.laps===2?2:1,total=names.length*laps,pool=[...new Set(faceIds)];
  if(pool.length<total*5)throw Error('この人数で使う写真を準備できませんでした。');
  const clueCount=cluesPerRound(names.length),indices=Array.from({length:clueCount},(_,index)=>index);
