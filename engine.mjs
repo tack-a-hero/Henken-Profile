@@ -4,24 +4,36 @@ export const shuffled=(items,rng=Math.random)=>{const a=[...items];for(let i=a.l
 export const MIN_PLAYERS=3;
 export const MAX_PLAYERS=6;
 export const cluesPerRound=playerCount=>playerCount===3?4:3;
+export function anonymousClueOrder(clues, rng = Math.random) {
+ const indices=clues.map((_,index)=>index);
+ const order=shuffled(indices,rng);
+ const writers=[...new Set(clues.map(clue=>clue.writer))];
+ const writingOrder=writers.flatMap(writer=>indices.filter(index=>clues[index].writer===writer));
+ if(order.every((index,position)=>clues[index].writer===clues[writingOrder[position]].writer)){
+  const different=order.findIndex(index=>clues[index].writer!==clues[order[0]].writer);
+  if(different>0)[order[0],order[different]]=[order[different],order[0]];
+ }
+ return order;
+}
 export function createGame(settings,faceIds,topics,rng=Math.random){
  const names=settings.names.map((x,i)=>String(x).trim().slice(0,18)||'プレイヤー'+(i+1));
  if(names.length<MIN_PLAYERS||names.length>MAX_PLAYERS)throw Error('3〜6人で遊べます。');
  const laps=settings.laps===2?2:1,total=names.length*laps,pool=[...new Set(faceIds)];
  if(pool.length<total*5)throw Error('この人数で使う写真を準備できませんでした。');
- const clueCount=cluesPerRound(names.length),indices=Array.from({length:clueCount},(_,index)=>index);
+ const clueCount=cluesPerRound(names.length);
  const selected=topics.filter(t=>settings.genres.includes(t.genre));if(selected.length<clueCount)throw Error('お題のジャンルを選んでください。');
  const faces=settings.faceOrder?settings.faceOrder.filter(id=>pool.includes(id)):shuffled(pool,rng);let deck=settings.topicOrder?settings.topicOrder.map(id=>selected.find(t=>t.id===id)).filter(Boolean):shuffled(selected,rng),used=0;
  const rounds=Array.from({length:total},(_,index)=>{const host=index%names.length,writers=Array.from({length:Math.min(3,names.length-1)},(_,j)=>(host+j+1)%names.length);
   if(used+clueCount>deck.length){deck=shuffled(selected,rng);used=0}const deal=shuffled(faces.splice(0,5),rng),targetId=deal[0];
-  return {host,writers,targetId,bonusCardId:deal[1],candidates:shuffled(deal,rng),clues:deck.slice(used,used+=clueCount).map((t,j)=>({topicId:t.id,title:t.title,genre:t.genre,writer:writers[j%writers.length],text:''})),selected:null,guess:null,correct:null,resultRevealed:false,bestClue:null,displayOrder:shuffled(indices,rng),bestOrder:shuffled(indices,rng),bestConfirmed:false};
+  const clues=deck.slice(used,used+=clueCount).map((t,j)=>({topicId:t.id,title:t.title,genre:t.genre,writer:writers[j%writers.length],text:''}));
+  return {host,writers,targetId,bonusCardId:deal[1],candidates:shuffled(deal,rng),clues,selected:null,guess:null,correct:null,resultRevealed:false,bestClue:null,displayOrder:anonymousClueOrder(clues,rng),bestOrder:anonymousClueOrder(clues,rng),bestConfirmed:false};
  });return {version:VERSION,names,laps,rounds,roundIndex:0,writerCursor:0,phase:'writer-pass',createdAt:Date.now()};
 }
 export const currentRound=g=>g.rounds[g.roundIndex];
 export const currentWriter=g=>currentRound(g).writers[g.writerCursor];
 export const assignedClues=g=>currentRound(g).clues.map((c,i)=>({...c,index:i})).filter(c=>c.writer===currentWriter(g));
 export function openWriter(g){if(g.phase!=='writer-pass')throw Error('手番が違います。');g.phase='write'}
-export function submitWriter(g){if(g.phase!=='write')throw Error('今はプロフィールの入力中ではありません。');if(!assignedClues(g).every(c=>c.text.trim()))throw Error('担当のプロフィールを入力してください。');g.phase=++g.writerCursor<currentRound(g).writers.length?'writer-pass':'answer'}
+export function submitWriter(g){if(g.phase!=='write')throw Error('今はプロフィールの入力中ではありません。');if(!assignedClues(g).every(c=>c.text.trim()))throw Error('担当のプロフィールを入力してください。');const round=currentRound(g);g.phase=++g.writerCursor<round.writers.length?'writer-pass':'answer';if(g.phase==='answer'){round.displayOrder=anonymousClueOrder(round.clues);round.bestOrder=anonymousClueOrder(round.clues)}}
 export function selectPerson(g,id){if(g.phase==='answer'&&currentRound(g).candidates.includes(id))currentRound(g).selected=id}
 export function lockGuess(g){const r=currentRound(g);if(g.phase!=='answer'||!r.candidates.includes(r.selected))throw Error('ひとりを選んでください。');r.guess=r.selected;r.correct=null;r.resultRevealed=false;r.bestClue=null;r.bestConfirmed=false;g.phase='result'}
 export function revealResult(g){if(g.phase!=='result')return;const r=currentRound(g);r.resultRevealed=true;r.correct=r.guess===r.targetId;if(r.writers.length===1)r.bestClue=0}
