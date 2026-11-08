@@ -1,5 +1,5 @@
-import {FACES,ARCHIVED_FACES} from './faces.mjs?v=11';
-import {PORTRAIT_FRAMING} from './portrait-framing.mjs?v=11';
+import {FACES,ARCHIVED_FACES} from './faces.mjs?v=12';
+import {PORTRAIT_FRAMING} from './portrait-framing.mjs?v=12';
 import {GENRES,TOPICS} from './topics.mjs?v=7';
 import {createGame,currentRound,currentWriter,assignedClues,openWriter,submitWriter,selectPerson,lockGuess,revealResult,chooseBest,nextRound,collected,awards,scores,shuffled,validateGame,protectPrivate,CLUES_PER_ROUND,MIN_PLAYERS,MAX_PLAYERS,anonymousClueOrder,prizeOptions,choosePrize} from './engine.mjs?v=10';
 const $=s=>document.querySelector(s),app=$('#app'),bar=$('#action-bar'),dialog=$('#dialog');
