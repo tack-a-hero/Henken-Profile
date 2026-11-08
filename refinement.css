@@ -17,3 +17,8 @@
 .home-intro .eyebrow{color:var(--primary);font-size:11px;letter-spacing:.12em}.home-title{font-weight:900}.home-photos{gap:8px}.home-photos > .portrait-frame{border-radius:6px}.how-short{border-top:1px solid var(--line)}.how-short .step-number{font-size:11px;font-weight:900}.home-photo-note{font-size:11px}.home .home-links{gap:8px 16px}
 @media(max-width:759px){.all-clues{gap:8px}.visible-clue{padding:12px}.visible-clue dt{padding-bottom:4px;margin-bottom:2px;font-size:12px}.visible-clue dd{font-size:19px;min-height:28px}.best-choice{padding:12px 44px 12px 12px;gap:6px}.best-choice:after{right:12px}.candidate-grid{gap:8px}.candidate-bottom{left:6px;right:6px;bottom:6px}.home-photos{margin-left:-12px;margin-right:-12px;gap:4px}.home-photos > .portrait-frame{border-radius:0}.live-scores>div{gap:12px}.home .home-links .primary{min-height:52px}}
 @media(max-width:759px) and (orientation:portrait){.writer-body{display:flex;flex-direction:column;gap:16px}.writer-photo{position:static;max-width:none;width:100%}.writer-photo figcaption{display:none}.clue-form{width:100%}.writer-photo button{width:100%}.keyboard-open .writer-body{display:grid;grid-template-columns:80px minmax(0,1fr);align-items:start}.keyboard-open .writer-photo{width:80px}.writer .progress-line{margin-bottom:0}}
+
+/* Prevent focus and rapid taps from triggering browser zoom. Keep pinch zoom available. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{touch-action:manipulation}
+.name-row input,.clue-field textarea{font-size:18px}
