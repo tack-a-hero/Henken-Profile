@@ -22,3 +22,5 @@
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{touch-action:manipulation}
 .name-row input,.clue-field textarea{font-size:18px}
+
+.name-row input::placeholder{color:var(--muted);opacity:1}
